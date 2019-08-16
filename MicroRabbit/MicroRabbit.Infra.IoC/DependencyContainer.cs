@@ -13,7 +13,6 @@ namespace MicroRabbit.Infra.IoC
         {
             //DomainBus
             services.AddTransient<IEventBus, RabbitMQBus>();
-
         }
     }
 }
