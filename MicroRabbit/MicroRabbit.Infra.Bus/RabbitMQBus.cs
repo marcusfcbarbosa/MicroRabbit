@@ -26,18 +26,20 @@ namespace MicroRabbit.Infra.Bus
             _eventTypes = new List<Type>();
         }
 
-        //está relacionado ao comando de envio de barramento
+        //o mediator define para qual fila vai enviar o command
         public Task SendCommand<T>(T command) where T : Command
         {
             return _mediator.Send(command);
         }
-
+        //usado por varios  microserviços para publicar eventos no servidor RabbitMQ
+        //Para isso faz uso do RabbitMQ.Client
         public void Publish<T>(T @event) where T : Event
         {
             var factory = new ConnectionFactory()
             {
                 HostName = "localhost"
             };
+            //enviando para a fila
             using (var connection = factory.CreateConnection())
             {
                 using (var channel = connection.CreateModel())
@@ -51,6 +53,8 @@ namespace MicroRabbit.Infra.Bus
             }
         }
 
+        //quando um evento envia a serviços publicados
+        //e para cada evento T , existe um eventHandler TH
         public void Subscribe<T, TH>()
             where T : Event
             where TH : IEventHandler<T>
@@ -87,6 +91,8 @@ namespace MicroRabbit.Infra.Bus
             var channel = connection.CreateModel();
             var eventName = typeof(T).Name;
             channel.QueueDeclare(eventName, false, false, false, null);
+
+            //faz uso do RabbitMQ.Client.Events
             var consumer = new AsyncEventingBasicConsumer(channel);
 
             consumer.Received += Consumer_Received;
