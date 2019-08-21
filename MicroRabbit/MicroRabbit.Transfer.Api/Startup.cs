@@ -1,6 +1,10 @@
-﻿using MediatR;
+﻿using System;
+using MediatR;
+using MicroRabbit.Domain.Core.Bus;
 using MicroRabbit.Infra.IoC;
 using MicroRabbit.Transfer.Data._1_Context;
+using MicroRabbit.Transfer.Domain._3_Events;
+using MicroRabbit.Transfer.Domain._4_EventHandlers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -63,6 +67,15 @@ namespace MicroRabbit.Transfer.Api
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "Transfer Microservices V1");
             });
             app.UseMvc();
+            
+            //quaisquer microserviços que irão subscrever a um evento, necessitam dessa configuração
+            ConfigureEventBus(app);
+        }
+
+        private void ConfigureEventBus(IApplicationBuilder app)
+        {
+            var eventBus = app.ApplicationServices.GetRequiredService<IEventBus>();
+            eventBus.Subscribe<TransferCreatedEvent, TransferEventHandler>();
         }
     }
 }

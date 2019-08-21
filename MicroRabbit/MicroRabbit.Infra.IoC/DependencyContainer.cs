@@ -28,8 +28,7 @@ namespace MicroRabbit.Infra.IoC
 
             //Domain Events
             services.AddTransient<IEventHandler<TransferCreatedEvent>, TransferEventHandler>();
-
-
+            
             //Domain Banking Commands
             services.AddTransient<IRequestHandler<CreateTransferCommand, bool>,TransferCommandHandler>();
 

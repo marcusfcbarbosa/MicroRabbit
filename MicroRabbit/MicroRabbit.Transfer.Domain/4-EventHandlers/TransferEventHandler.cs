@@ -9,7 +9,6 @@ namespace MicroRabbit.Transfer.Domain._4_EventHandlers
 {
     public class TransferEventHandler : IEventHandler<TransferCreatedEvent>
     {
-
         public TransferEventHandler()
         {
 
