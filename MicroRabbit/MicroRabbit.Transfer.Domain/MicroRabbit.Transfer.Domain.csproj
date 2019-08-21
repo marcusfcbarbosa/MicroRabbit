@@ -7,8 +7,10 @@
   <ItemGroup>
     <Folder Include="2-CommandHandlers\" />
     <Folder Include="1-Commands\" />
-    <Folder Include="3-Events\" />
-    <Folder Include="4-EventHandlers\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MicroRabbit.Domain.Core\MicroRabbit.Domain.Core.csproj" />
   </ItemGroup>
 
 </Project>
