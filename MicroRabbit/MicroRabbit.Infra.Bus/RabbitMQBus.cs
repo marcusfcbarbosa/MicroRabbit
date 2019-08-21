@@ -2,6 +2,7 @@
 using MicroRabbit.Domain.Core.Bus;
 using MicroRabbit.Domain.Core.Commands;
 using MicroRabbit.Domain.Core.Events;
+using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
@@ -18,12 +19,15 @@ namespace MicroRabbit.Infra.Bus
         private readonly IMediator _mediator;
         private readonly Dictionary<string, List<Type>> _handlers;
         private readonly List<Type> _eventTypes;
+        private readonly IServiceScopeFactory _serviceScopeFactory;
 
-        public RabbitMQBus(IMediator mediator)
+        public RabbitMQBus(IMediator mediator, IServiceScopeFactory serviceScopeFactory)
         {
             _mediator = mediator;
             _handlers = new Dictionary<string, List<Type>>();
             _eventTypes = new List<Type>();
+
+            _serviceScopeFactory = serviceScopeFactory;
         }
 
         //o mediator define para qual fila vai enviar o command
@@ -121,16 +125,42 @@ namespace MicroRabbit.Infra.Bus
             if (_handlers.ContainsKey(eventName))
             {
                 var subscriptions = _handlers[eventName];
-                foreach (var subscription in subscriptions) {
-                    var handler = Activator.CreateInstance(subscription);
-                    if (handler == null) continue;
+                using (var scope = _serviceScopeFactory.CreateScope()) {
+                    foreach (var subscription in subscriptions)
+                    {
+                        //dessa forma pode-se usar um EventHandler, que não tenha um construtor vazio
+                        var handler = scope.ServiceProvider.GetService(subscription);
+                        if (handler == null) continue;
 
-                    var eventype = _eventTypes.SingleOrDefault(t => t.Name == eventName);
-                    var @event = JsonConvert.DeserializeObject(message, eventype);
-                    var concreteType = typeof(IEventHandler<>).MakeGenericType(eventype);
-                    await (Task)concreteType.GetMethod("Handle").Invoke(handler, new object[] { @event });
+                        var eventype = _eventTypes.SingleOrDefault(t => t.Name == eventName);
+                        var @event = JsonConvert.DeserializeObject(message, eventype);
+                        var concreteType = typeof(IEventHandler<>).MakeGenericType(eventype);
+                        await (Task)concreteType.GetMethod("Handle").Invoke(handler, new object[] { @event });
+                    }
                 }
             }
         }
+
+        //private async Task ProcessEvent(string eventName, string message)
+        //{
+        //    if (_handlers.ContainsKey(eventName))
+        //    {
+        //        var subscriptions = _handlers[eventName];
+        //        foreach (var subscription in subscriptions)
+        //        {
+        //            //Para que o Activator.CreateInstance possa ocorrer necessita que o 
+        //            //EventHandler em questao tenha um construtor sem parametros
+        //            // o que nao permite que se faça uma injeçao de dependencia
+        //            var handler = Activator.CreateInstance(subscription);
+
+        //            if (handler == null) continue;
+
+        //            var eventype = _eventTypes.SingleOrDefault(t => t.Name == eventName);
+        //            var @event = JsonConvert.DeserializeObject(message, eventype);
+        //            var concreteType = typeof(IEventHandler<>).MakeGenericType(eventype);
+        //            await (Task)concreteType.GetMethod("Handle").Invoke(handler, new object[] { @event });
+        //        }
+        //    }
+        //}
     }
 }

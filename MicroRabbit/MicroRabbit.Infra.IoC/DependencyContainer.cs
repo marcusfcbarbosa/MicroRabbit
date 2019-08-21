@@ -24,15 +24,25 @@ namespace MicroRabbit.Infra.IoC
         public static void RegisterServices(IServiceCollection services)
         {
             //DomainBus
-            services.AddTransient<IEventBus, RabbitMQBus>();
+            //Dessa forma os EventHandlers podem sofrer uma injeção de dependencia
+            services.AddSingleton<IEventBus, RabbitMQBus>(sp =>
+            {
+                var scopeFactory = sp.GetRequiredService<IServiceScopeFactory>();
+                return new RabbitMQBus(sp.GetService<IMediator>(), scopeFactory);
+            });
+
+
+            //Subscriptions
+            services.AddTransient<TransferEventHandler>();
+
 
             //Domain Events
             services.AddTransient<IEventHandler<TransferCreatedEvent>, TransferEventHandler>();
-            
-            //Domain Banking Commands
-            services.AddTransient<IRequestHandler<CreateTransferCommand, bool>,TransferCommandHandler>();
 
-                        
+            //Domain Banking Commands
+            services.AddTransient<IRequestHandler<CreateTransferCommand, bool>, TransferCommandHandler>();
+
+
             //Application Layer
             services.AddTransient<IAccountService, AccountService>();
             services.AddTransient<ITransferService, TransferService>();
