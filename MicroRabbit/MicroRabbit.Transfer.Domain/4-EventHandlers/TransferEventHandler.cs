@@ -2,14 +2,12 @@
 using MicroRabbit.Transfer.Domain._3_Events;
 using MicroRabbit.Transfer.Domain._5_Interfaces;
 using MicroRabbit.Transfer.Domain._6_Models;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace MicroRabbit.Transfer.Domain._4_EventHandlers
 {
     public class TransferEventHandler : IEventHandler<TransferCreatedEvent>
+         
     {
 
         private readonly ITransferRepository _transferRepository;
