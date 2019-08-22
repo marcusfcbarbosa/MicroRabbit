@@ -1,7 +1,7 @@
 # MicroRabbit
 Microservices whit RabbitMQ
-RabbitMq
-	1- Download e Instalaçao
+	#RabbitMq
+#1- Download e Instalaçao
 		Download
 		https://www.rabbitmq.com/install-windows.html
 		
@@ -9,7 +9,7 @@ RabbitMq
 		https://www.erlang.org/downloads
 		OTP 22.0 Windows 64-bit Binary File
 =================================================		
-  2- após instalação devemos ativar o Dashboard de administrador do RabbitMq
+#2- após instalação devemos ativar o Dashboard de administrador do RabbitMq
 	 RabbitMq Command prompt
 	 
 	 rabbitmq-plugins enable rabbitmq_management
@@ -21,7 +21,7 @@ RabbitMq
 	  login:guest
 	  senha:guest
 =================================================	  
-	 3-Comandos em linha de codigo
+#3-Comandos em linha de codigo
 		parar o applicativo
 		rabbitmqctl stop_app
 	 
@@ -44,7 +44,7 @@ RabbitMq
 		atribuindo permissoes de leitura e escrita para tudo ao usario
 			rabbitmqctl set_permissions -p / rafael ".*" ".*" ".*"
 =================================================
-4- Criando as migrations e rodando
+#4- Criando as migrations e rodando
 Contexto de Banking
 Apontando para .Data
 add-migration "Initial Migration" -Context BankingDbContext	
