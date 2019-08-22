@@ -7,9 +7,7 @@ using System.Threading.Tasks;
 namespace MicroRabbit.Transfer.Domain._4_EventHandlers
 {
     public class TransferEventHandler : IEventHandler<TransferCreatedEvent>
-         
     {
-
         private readonly ITransferRepository _transferRepository;
         public TransferEventHandler(ITransferRepository transferRepository)
         {
